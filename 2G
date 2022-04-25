@@ -1,0 +1,110 @@
+class AddProductsPageState extends State<AddProductsPage> {
+  final GlobalKey<FormState> _key = GlobalKey<FormState>();
+  String dropDownValue = '';
+  List<dynamic> list = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    Provider.of<CategoryProvider>(context, listen: false)
+        .getCategories()
+        .then((_) {
+      setState(() {
+        isLoading = false;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    final provider = Provider.of<CategoryProvider>(context).categoryList;
+    list = provider;
+
+    print('LIST $list');
+
+    // TODO: implement build
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        centerTitle: true,
+        leading: InkWell(
+          onTap: () => Navigator.of(context).pop(),
+          child: Padding(
+            padding: EdgeInsets.only(
+                left: width * 0.005,
+                top: height * 0.003,
+                right: width * 0.005,
+                bottom: height * 0.003),
+            child: Container(
+              width: width * 0.1,
+              height: height * 0.1,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 10,
+                      offset: Offset(1, 2),
+                    )
+                  ]),
+              child: const Icon(Icons.arrow_back_ios, color: Colors.green),
+            ),
+          ),
+        ),
+        title: const Text(
+          'Add Products',
+          style: TextStyle(
+              color: Color.fromARGB(255, 36, 71, 100),
+              fontWeight: FontWeight.bold,
+              fontSize: 25),
+        ),
+      ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.green,
+              ),
+            )
+          : Container(
+              width: double.infinity,
+              height: double.infinity,
+              // color: Colors.red,
+              padding: EdgeInsets.all(width * 0.04),
+              child: Form(
+                key: _key,
+                child: ListView(
+                  children: [
+                    const Text(
+                      'Select Category',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 36, 71, 100),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15),
+                    ),
+                    DropdownButton(        //This is where the error is pointed at
+                        value: dropDownValue ?? null,
+                        items: provider.map((e) {
+                          return DropdownMenuItem(
+                            value: e,
+                            child: Text(e['name']),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            dropDownValue = value.toString();
+                          });
+                        })
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+}
